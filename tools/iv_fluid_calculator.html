@@ -8,6 +8,7 @@
     body { font-family: sans-serif; margin: 2rem; }
     input, button { margin: 0.5rem; padding: 0.5rem; }
     table, th, td { border: 1px solid #ccc; border-collapse: collapse; padding: 0.5rem; }
+    #status { margin-top: 1rem; font-weight: bold; color: #555; }
   </style>
 </head>
 <body>
@@ -17,13 +18,17 @@
   <label>K (mEq): <input id="k" type="number" step="0.1" required></label><br>
   <button id="calculateBtn">Calculate</button>
 
+  <div id="status">⏳ Loading Pyodide…</div>
+
   <h2>Results</h2>
-  <div id="output">Loading Pyodide...</div>
+  <div id="output"></div>
 
 <script type="text/javascript">
   async function main() {
     let pyodide = await loadPyodide();
     await pyodide.loadPackagesFromImports();
+
+    document.getElementById("status").innerText = "✅ Ready";
 
     const pythonCode = `
 import itertools
@@ -45,38 +50,48 @@ fluids = [
 ]
 
 def run_calc():
-  water = int(document.getElementById("water").value)
-  target_na = float(document.getElementById("na").value)
-  target_k = float(document.getElementById("k").value)
-  num_bags = water // 500
-  combos = list(itertools.product(fluids, repeat=num_bags))
+  document.getElementById("status").innerText = "🔄 Calculating…"
+  try:
+    water = int(document.getElementById("water").value)
+    target_na = float(document.getElementById("na").value)
+    target_k = float(document.getElementById("k").value)
+    if water % 500 != 0 or water <= 0:
+        document.getElementById("status").innerText = "❌ Water must be positive and a multiple of 500"
+        return
 
-  results = []
-  for combo in combos:
-    total_na = sum(bag["Na"] for bag in combo)
-    total_k = sum(bag["K"] for bag in combo)
-    na_diff = abs(total_na - target_na)
-    k_diff = abs(total_k - target_k)
-    results.append({
-      "combo": ", ".join(bag["name"] for bag in combo),
-      "na": total_na,
-      "k": total_k,
-      "na_diff": na_diff,
-      "k_diff": k_diff
-    })
+    num_bags = water // 500
+    combos = list(itertools.product(fluids, repeat=num_bags))
 
-  sorted_results = sorted(results, key=lambda x: (x["na_diff"] + x["k_diff"]))[:5]
-  html = "<table><tr><th>Combo</th><th>Na</th><th>K</th><th>Na Diff</th><th>K Diff</th></tr>"
-  for r in sorted_results:
-    html += f"<tr><td>{r['combo']}</td><td>{r['na']}</td><td>{r['k']}</td><td>{r['na_diff']}</td><td>{r['k_diff']}</td></tr>"
-  html += "</table>"
-  document.getElementById("output").innerHTML = html
+    results = []
+    for combo in combos:
+        total_na = sum(bag["Na"] for bag in combo)
+        total_k = sum(bag["K"] for bag in combo)
+        na_diff = abs(total_na - target_na)
+        k_diff = abs(total_k - target_k)
+        results.append({
+          "combo": ", ".join(bag["name"] for bag in combo),
+          "na": total_na,
+          "k": total_k,
+          "na_diff": na_diff,
+          "k_diff": k_diff
+        })
+
+    sorted_results = sorted(results, key=lambda x: (x["na_diff"] + x["k_diff"]))[:5]
+    html = "<table><tr><th>Combo</th><th>Na</th><th>K</th><th>Na Diff</th><th>K Diff</th></tr>"
+    for r in sorted_results:
+        html += f"<tr><td>{r['combo']}</td><td>{r['na']}</td><td>{r['k']}</td><td>{r['na_diff']}</td><td>{r['k_diff']}</td></tr>"
+    html += "</table>"
+    document.getElementById("output").innerHTML = html
+    document.getElementById("status").innerText = "✅ Done"
+  except Exception as e:
+    document.getElementById("status").innerText = "⚠️ Error: " + str(e)
 `;
     pyodide.runPython(pythonCode);
+
     document.getElementById("calculateBtn").addEventListener("click", () => {
+      document.getElementById("status").innerText = "🔄 Running calculation…";
       pyodide.runPython("run_calc()");
     });
-    document.getElementById("output").innerHTML = "Ready.";
   }
 
   main();
