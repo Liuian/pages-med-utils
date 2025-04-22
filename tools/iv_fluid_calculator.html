@@ -5,30 +5,106 @@
   <title>IV Fluid Calculator</title>
   <script src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"></script>
   <style>
-    body { font-family: sans-serif; margin: 2rem; }
-    input, button { margin: 0.5rem; padding: 0.5rem; }
-    table, th, td { border: 1px solid #ccc; border-collapse: collapse; padding: 0.5rem; }
-    #status { margin-top: 1rem; font-weight: bold; color: #555; }
+    body {
+      font-family: "Segoe UI", Roboto, sans-serif;
+      background-color: #f0f8ff;
+      display: flex;
+      justify-content: center;
+      padding: 2rem;
+    }
+    .container {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 128, 255, 0.2);
+      max-width: 500px;
+      width: 100%;
+    }
+    h1 {
+      text-align: center;
+      color: #0077cc;
+    }
+    .form-group {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 1rem 0;
+    }
+    .form-group label {
+      flex: 1;
+      margin-right: 1rem;
+    }
+    .form-group input {
+      flex: 2;
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      width: 100%;
+      background-color: #0077cc;
+      color: white;
+      border: none;
+      padding: 0.8rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-top: 1rem;
+    }
+    button:hover {
+      background-color: #005fa3;
+    }
+    #status {
+      margin-top: 1rem;
+      font-weight: bold;
+      color: #333;
+      text-align: center;
+    }
+    table {
+      width: 100%;
+      margin-top: 1rem;
+      border-collapse: collapse;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 0.75rem;
+      text-align: center;
+    }
+    th {
+      background-color: #e6f2ff;
+    }
   </style>
 </head>
 <body>
-  <h1>IV Fluid Calculator</h1>
-  <label>Water (ml): <input id="water" type="number" step="500" required></label><br>
-  <label>Na (mEq): <input id="na" type="number" step="0.1" required></label><br>
-  <label>K (mEq): <input id="k" type="number" step="0.1" required></label><br>
-  <button id="calculateBtn">Calculate</button>
+  <div class="container">
+    <h1>IV Fluid Calculator</h1>
 
-  <div id="status">⏳ Loading Pyodide…</div>
+    <div class="form-group">
+      <label for="water">Water (ml):</label>
+      <input id="water" type="number" step="500" required>
+    </div>
+    <div class="form-group">
+      <label for="na">Na (mEq):</label>
+      <input id="na" type="number" step="0.1" required>
+    </div>
+    <div class="form-group">
+      <label for="k">K (mEq):</label>
+      <input id="k" type="number" step="0.1" required>
+    </div>
 
-  <h2>Results</h2>
-  <div id="output"></div>
+    <button id="calculateBtn">Calculate</button>
+    <div id="status">⏳ Loading Pyodide…</div>
 
-<script type="text/javascript">
-  async function main() {
-    let pyodide = await loadPyodide();
-    document.getElementById("status").innerText = "✅ Ready";
+    <div id="output"></div>
+  </div>
 
-    const pythonCode = `
+  <script type="text/javascript">
+    async function main() {
+      let pyodide = await loadPyodide();
+      document.getElementById("status").innerText = "✅ Ready";
+
+      const pythonCode = `
 import itertools
 from js import document
 
@@ -84,15 +160,15 @@ def run_calc():
   except Exception as e:
     document.getElementById("status").innerText = "⚠️ Error: " + str(e)
 `;
-    pyodide.runPython(pythonCode);
+      pyodide.runPython(pythonCode);
 
-    document.getElementById("calculateBtn").addEventListener("click", () => {
-      document.getElementById("status").innerText = "🔄 Running calculation…";
-      pyodide.runPython("run_calc()");
-    });
-  }
+      document.getElementById("calculateBtn").addEventListener("click", () => {
+        document.getElementById("status").innerText = "🔄 Running calculation…";
+        pyodide.runPython("run_calc()");
+      });
+    }
 
-  main();
-</script>
+    main();
+  </script>
 </body>
 </html>
