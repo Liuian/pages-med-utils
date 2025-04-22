@@ -26,8 +26,6 @@
 <script type="text/javascript">
   async function main() {
     let pyodide = await loadPyodide();
-    await pyodide.loadPackagesFromImports();
-
     document.getElementById("status").innerText = "✅ Ready";
 
     const pythonCode = `
