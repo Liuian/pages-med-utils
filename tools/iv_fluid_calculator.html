@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>IV Fluid Calculator</title>
   <script src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"></script> <!-- 從 CDN 載入 Pyodide（能讓 Python 在瀏覽器中執行的工具） -->
-  <style>
+  <style> /* 內嵌 CSS 樣式表，設定整體頁面樣式（字體、顏色、按鈕、輸入框等），以淺藍色為主題風格 */
     body {
       font-family: "Segoe UI", Roboto, sans-serif;
       background-color: #f0f8ff;
@@ -94,16 +94,17 @@
     </div>
 
     <button id="calculateBtn">Calculate</button>
-    <div id="status">⏳ Loading Pyodide…</div>
+    <div id="status">⏳ Loading Pyodide…</div>  <!-- 「計算」按鈕，下面是狀態提示區（預設顯示 Pyodide 載入中） -->
 
-    <div id="output"></div>
+    <div id="output"></div> <!-- 顯示計算結果的地方（HTML 表格將插入這裡） -->
   </div>
 
   <script type="text/javascript">
     async function main() {
-      let pyodide = await loadPyodide();
+      let pyodide = await loadPyodide();  // 非同步初始化 Pyodide（等它載入完）
       document.getElementById("status").innerText = "✅ Ready";
 
+      // 嵌入 Python 程式碼（字串形式）
       const pythonCode = `
 import itertools
 from js import document
