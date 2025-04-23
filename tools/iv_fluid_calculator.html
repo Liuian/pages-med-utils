@@ -127,16 +127,31 @@ fluids = [
 def run_calc():
   document.getElementById("status").innerText = "🔄 Calculating…"
   try:
+    # 從輸入欄位讀取「水量、Na、K」
     water = int(document.getElementById("water").value)
     target_na = float(document.getElementById("na").value)
     target_k = float(document.getElementById("k").value)
+    
+    # 如果水不是 500 的倍數或 <= 0，就報錯
     if water % 500 != 0 or water <= 0:
         document.getElementById("status").innerText = "❌ Water must be positive and a multiple of 500"
         return
 
+    # 產生所有可能的 fluid 組合（例如輸入 1500ml 就會組出 3 包的所有排列）
     num_bags = water // 500
     combos = list(itertools.product(fluids, repeat=num_bags))
 
+    # 去除排列重複，只保留組合
+    unique_keys = set()
+    combos = []
+    for combo in raw_combos:
+        counter = Counter(bag["name"] for bag in combo)
+        key = tuple(sorted(counter.items()))
+        if key not in unique_keys:
+            unique_keys.add(key)
+            combos.append(combo)
+
+    # 算出每組組合的總 Na、總 K，並計算與目標差距
     results = []
     for combo in combos:
         total_na = sum(bag["Na"] for bag in combo)
@@ -152,12 +167,17 @@ def run_calc():
         })
 
     sorted_results = sorted(results, key=lambda x: (x["na_diff"] + x["k_diff"]))[:5]
+    
+    # 用 HTML 表格把前 5 組結果顯示出來
     html = "<table><tr><th>Combo</th><th>Na</th><th>K</th><th>Na Diff</th><th>K Diff</th></tr>"
     for r in sorted_results:
         html += f"<tr><td>{r['combo']}</td><td>{r['na']}</td><td>{r['k']}</td><td>{r['na_diff']}</td><td>{r['k_diff']}</td></tr>"
     html += "</table>"
+
+    # 把表格插入畫面，更新狀態為 Done
     document.getElementById("output").innerHTML = html
     document.getElementById("status").innerText = "✅ Done"
+
   except Exception as e:
     document.getElementById("status").innerText = "⚠️ Error: " + str(e)
 `;
