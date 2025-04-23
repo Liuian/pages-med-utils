@@ -139,7 +139,7 @@ def run_calc():
 
     # 產生所有可能的 fluid 組合（例如輸入 1500ml 就會組出 3 包的所有排列）
     num_bags = water // 500
-    combos = list(itertools.product(fluids, repeat=num_bags))
+    raw_combos = list(itertools.product(fluids, repeat=num_bags))
 
     # 去除排列重複，只保留組合
     unique_keys = set()
@@ -181,6 +181,7 @@ def run_calc():
   except Exception as e:
     document.getElementById("status").innerText = "⚠️ Error: " + str(e)
 `;
+      // 把整段 Python 程式碼載入進 Pyodide, 當按下「Calculate」時，執行 run_calc() 函數
       pyodide.runPython(pythonCode);
 
       document.getElementById("calculateBtn").addEventListener("click", () => {
