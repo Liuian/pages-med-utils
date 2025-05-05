@@ -93,6 +93,8 @@
       <input id="k" type="number" step="0.1" required>
     </div>
 
+    <div class="checkboxes" id="fluidCheckboxes"></div> <!-- TODO -->
+
     <button id="calculateBtn">Calculate</button>
     <div id="status">⏳ Loading Pyodide…</div>  <!-- 「計算」按鈕，下面是狀態提示區（預設顯示 Pyodide 載入中） -->
 
@@ -100,9 +102,39 @@
   </div>
 
   <script type="text/javascript">
+    const fluidList = [
+      {"name": "0.9%NaCl", "Na": 154, "K": 0, "ml": 500},
+      {"name": "0.45%NaCl", "Na": 77, "K": 0, "ml": 500},
+      {"name": "3%NaCl", "Na": 513, "K": 0, "ml": 500},
+      {"name": "D5W", "Na": 0, "K": 0, "ml": 500},
+      {"name": "D10W", "Na": 0, "K": 0, "ml": 500},
+      {"name": "D2.5/0.45S", "Na": 77, "K": 0, "ml": 500},
+      {"name": "LR", "Na": 130, "K": 4, "ml": 500},
+      {"name": "Tai 1", "Na": 6, "K": 3, "ml": 500},
+      {"name": "Tai 2", "Na": 25, "K": 6, "ml": 500},
+      {"name": "Tai 3", "Na": 61, "K": 16, "ml": 500},
+      {"name": "Tai 4", "Na": 110, "K": 20, "ml": 500},
+      {"name": "Tai 5", "Na": 36, "K": 12, "ml": 500}
+    ];
+
+    fluidList.forEach(fluid => {
+      const div = document.createElement("div");
+      div.innerHTML = `<label><input type="checkbox" name="fluid" value="${fluid.name}" checked> ${fluid.name}</label>`;
+      document.getElementById("fluidCheckboxes").appendChild(div);
+    });
+
+    // 加入 JavaScript 函數，收集被勾選的輸液
+    function getCheckedFluids() {
+      const checkboxes = document.querySelectorAll('input[name="fluid"]:checked');
+      const checkedNames = Array.from(checkboxes).map(cb => cb.value);
+      return fluidList.filter(fluid => checkedNames.includes(fluid.name));
+    }
+
     async function main() {
       let pyodide = await loadPyodide();  // 非同步初始化 Pyodide（等它載入完）
       document.getElementById("status").innerText = "✅ Ready";
+            
+      pyodide.globals.set("fluids", pyodide.toPy(fluidList));   // 把 fluidList 資料傳給 Python
 
       // 嵌入 Python 程式碼（字串形式）
       const pythonCode = `
@@ -110,20 +142,7 @@ import itertools
 from collections import Counter
 from js import document
 
-fluids = [
-  {"name": "0.9%NaCl", "Na": 154, "K": 0, "ml": 500},
-  {"name": "0.45%NaCl", "Na": 77, "K": 0, "ml": 500},
-  {"name": "3%NaCl", "Na": 513, "K": 0, "ml": 500},
-  {"name": "D5W", "Na": 0, "K": 0, "ml": 500},
-  {"name": "D10W", "Na": 0, "K": 0, "ml": 500},
-  {"name": "D2.5/0.45S", "Na": 77, "K": 0, "ml": 500},
-  {"name": "LR", "Na": 130, "K": 4, "ml": 500},
-  {"name": "Tai 1", "Na": 6, "K": 3, "ml": 500},
-  {"name": "Tai 2", "Na": 25, "K": 6, "ml": 500},
-  {"name": "Tai 3", "Na": 61, "K": 16, "ml": 500},
-  {"name": "Tai 4", "Na": 110, "K": 20, "ml": 500},
-  {"name": "Tai 5", "Na": 36, "K": 12, "ml": 500}
-]
+fluids = [dict(f) for f in globals()["fluids"]] # 這裡從 js 取得 fluids 變數
 
 def run_calc():
   document.getElementById("status").innerText = "🔄 Calculating…"
@@ -182,11 +201,14 @@ def run_calc():
   except Exception as e:
     document.getElementById("status").innerText = "⚠️ Error: " + str(e)
 `;
+
       // 把整段 Python 程式碼載入進 Pyodide, 當按下「Calculate」時，執行 run_calc() 函數
       pyodide.runPython(pythonCode);
 
       document.getElementById("calculateBtn").addEventListener("click", () => {
         document.getElementById("status").innerText = "🔄 Running calculation…";
+        const selectedFluids = getCheckedFluids();  // 抓取勾選的 fluids
+        pyodide.globals.set("fluids", pyodide.toPy(selectedFluids));    // 傳給 Python
         pyodide.runPython("run_calc()");
       });
     }
