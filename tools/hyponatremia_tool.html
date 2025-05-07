@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="../assets/css/style.css">
   </head>
   <body class="bg-light">
-    <div class="container py-5">
+    <!-- <div class="container py-5">
       <h1 class="mb-4">低血鈉鑑別診斷工具</h1>
 
       <form id="form">
@@ -46,8 +46,49 @@
       </form>
 
       <div id="result" class="mt-4 p-3 bg-white border rounded" style="display:none;"></div>
-    </div>
+    </div> -->
 
+
+    <div class="container">
+      <h1>低血鈉鑑別診斷工具</h1>
+    
+      <form id="form">
+        <div class="form-group">
+          <label for="na">血鈉 (Na, mEq/L):</label>
+          <input type="number" step="0.1" id="na" required>
+        </div>
+    
+        <div class="form-group">
+          <label for="serumOsm">血漿滲透壓 (Serum Osm, mOsm/kg):</label>
+          <input type="number" step="0.1" id="serumOsm" required>
+        </div>
+    
+        <div class="form-group">
+          <label for="urineOsm">尿液滲透壓 (Urine Osm, mOsm/kg):</label>
+          <input type="number" step="0.1" id="urineOsm" required>
+        </div>
+    
+        <div class="form-group">
+          <label for="urineNa">尿鈉 (Urine Na, mEq/L):</label>
+          <input type="number" step="0.1" id="urineNa" required>
+        </div>
+    
+        <div class="form-group">
+          <label for="volumeStatus">臨床體液狀態（Volume Status）</label>
+          <select id="volumeStatus" required>
+            <option value="">請選擇</option>
+            <option value="hypovolemic">低容量 (Hypovolemic)</option>
+            <option value="euvolemic">正常容量 (Euvolemic)</option>
+            <option value="hypervolemic">高容量 (Hypervolemic)</option>
+          </select>
+        </div>
+    
+        <button type="button" id="diagnoseBtn">執行鑑別診斷</button>
+      </form>
+    
+      <div id="result" class="output"></div>
+    </div>
+    
     <script>
       function diagnose() {
         const na = parseFloat(document.getElementById('na').value);
