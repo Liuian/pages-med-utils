@@ -113,11 +113,13 @@ def run_calc():
           "combo": ", ".join(bag["name"] for bag in combo),
           "na": total_na,
           "k": total_k,
+          "na_diff_sort": na_diff,
+          "k_diff_sort": k_diff,
           "na_diff": f"{na_diff} ({round((na_diff / target_na * 100) if target_na else 0, 1)}%)",
           "k_diff": f"{k_diff} ({round((k_diff / target_k * 100) if target_k else 0, 1)}%)"
         })
 
-    sorted_results = sorted(results, key=lambda x: (x["na_diff"] + x["k_diff"]))[:5]
+    sorted_results = sorted(results, key=lambda x: (x["na_diff_sort"] + x["k_diff_sort"]))[:5]
     
     # 用 HTML 表格把前 5 組結果顯示出來
     html = "<table><tr><th>Combo</th><th>Na</th><th>K</th><th>Na Diff</th><th>K Diff</th></tr>"
