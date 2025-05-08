@@ -111,7 +111,7 @@ def run_calc():
         k_diff = abs(total_k - target_k)
         results.append({
           "combo": ", ".join(
-              f"<strong>{name}</strong>" if count == 1 else f"<strong>{name}</strong> ×{count}"
+              f"<strong>{name}</strong>" if count == 1 else f"<strong>{name}</strong>×{count}"
               for name, count in Counter(bag["name"] for bag in combo).items()
           ),
           "na": total_na,
