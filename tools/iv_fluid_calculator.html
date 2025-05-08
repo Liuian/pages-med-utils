@@ -24,7 +24,7 @@
       <input id="k" type="number" step="0.1" required>
     </div>
 
-    <div class="checkboxes" id="fluidCheckboxes"></div> <!-- TODO -->
+    <div class="checkboxes" id="fluidCheckboxes"></div>
 
     <button id="calculateBtn">Calculate</button>
     <div id="status">⏳ Loading Pyodide…</div>  <!-- 「計算」按鈕，下面是狀態提示區（預設顯示 Pyodide 載入中） -->
@@ -110,7 +110,7 @@ def run_calc():
         na_diff = abs(total_na - target_na)
         k_diff = abs(total_k - target_k)
         results.append({
-          "combo": ", ".join(bag["name"] for bag in combo),
+          "combo": ", ".join(f"**{name}** ×{count}" for name, count in Counter(bag["name"] for bag in combo).items()),
           "na": total_na,
           "k": total_k,
           "na_diff_sort": na_diff,
