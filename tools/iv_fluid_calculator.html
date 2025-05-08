@@ -153,3 +153,16 @@ def run_calc():
   </script>
 </body>
 </html>
+
+
+
+<!-- 
+"combo": ", ".join(bag["name"] for bag in combo),
+
+"combo": ", ".join(f"<strong>{name}</strong> ×{count}" for name, count in Counter(bag["name"] for bag in combo).items()),
+
+"combo": ", ".join(
+        f"<strong>{name}</strong>" if count == 1 else f"<strong>{name}</strong>×{count}"
+        for name, count in Counter(bag["name"] for bag in combo).items()
+),
+-->
