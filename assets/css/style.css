@@ -87,7 +87,9 @@ white-space: nowrap;
 .checkboxes input[type="checkbox"] {
 margin-right: 0.4rem;
 }
-select {
+
+/* button style */
+select {    
     padding: 10px;
     border: none;
     border-radius: 8px;
